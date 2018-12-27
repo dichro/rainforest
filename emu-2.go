@@ -56,8 +56,28 @@ func (i InstantaneousDemand) DemandKW() float64 {
 	return float64(i.Demand) * mul / div
 }
 
+type CurrentSummationDelivered struct {
+	DeviceMacId         string
+	MeterMacId          string
+	TimeStamp           HexInt64
+	SummationDelivered  HexInt64
+	SummationReceived   HexInt64
+	Multiplier          HexInt64
+	Divisor             HexInt64
+	DigitsRight         HexInt64
+	DigitsLeft          HexInt64
+	SuppressLeadingZero string
+}
+
+type TimeCluster struct {
+	DeviceMacId string
+	MeterMacId  string
+	UTCTime     HexInt64
+	LocalTime   HexInt64
+}
+
 type EMU2Message struct {
 	InstantaneousDemand
-	// CurrentSummationDelivered
-	// TimeCluster
+	CurrentSummationDelivered
+	TimeCluster
 }
