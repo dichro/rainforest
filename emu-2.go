@@ -1,15 +1,9 @@
-package main
+package rainforest
 
 import (
 	"encoding/xml"
 	"errors"
-	"flag"
-	"fmt"
-	"io"
-	"os"
 	"strconv"
-
-	"github.com/golang/glog"
 )
 
 // HexInt64 is an int64 that hex-decodes itself on UnmarshalXML.
@@ -51,27 +45,4 @@ type InstantaneousDemand struct {
 
 type EMU2Message struct {
 	InstantaneousDemand
-}
-
-func main() {
-	flag.Parse()
-	/*
-		f, err := os.Open("/dev/ttyACM0")
-		if err != nil {
-			glog.Exit(err)
-		}
-	*/
-	f := os.Stdin
-	r := xml.NewDecoder(f)
-	var m EMU2Message
-	for {
-		switch err := r.Decode(&m); err {
-		case io.EOF:
-			return
-		case nil:
-			fmt.Printf("%#v\n", m)
-		default:
-			glog.Error(err)
-		}
-	}
 }

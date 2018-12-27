@@ -1,4 +1,4 @@
-package main
+package rainforest
 
 import (
 	"encoding/xml"
