@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/xml"
 	"flag"
-	"fmt"
+	"html/template"
 	"io"
 	"os"
 
@@ -11,16 +11,25 @@ import (
 	"github.com/golang/glog"
 )
 
+const tmpl = `Timestamp: {{ .TimeStamp }}
+Device: {{ .DeviceMacId }}
+Meter: {{ .MeterMacId }}
+Demand: {{ .DemandKW }} kW
+`
+
 func main() {
+	t := template.Must(template.New("").Parse(tmpl))
 	flag.Parse()
 	r := xml.NewDecoder(os.Stdin)
-	var m rainforest.EMU2Message
 	for {
+		var m rainforest.EMU2Message
 		switch err := r.Decode(&m); err {
 		case io.EOF:
 			return
 		case nil:
-			fmt.Printf("%#v\n", m)
+			if err := t.Execute(os.Stdout, m.InstantaneousDemand); err != nil {
+				glog.Exit(err)
+			}
 		default:
 			glog.Error(err)
 		}

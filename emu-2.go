@@ -43,6 +43,21 @@ type InstantaneousDemand struct {
 	SuppressLeadingZero string
 }
 
+// DemandKW returns the Demand expressed in kilowatts.
+func (i InstantaneousDemand) DemandKW() float64 {
+	mul := float64(i.Multiplier)
+	if mul == 0 {
+		mul = 1
+	}
+	div := float64(i.Divisor)
+	if div == 0 {
+		div = 1
+	}
+	return float64(i.Demand) * mul / div
+}
+
 type EMU2Message struct {
 	InstantaneousDemand
+	// CurrentSummationDelivered
+	// TimeCluster
 }
