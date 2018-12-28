@@ -30,6 +30,7 @@ func main() {
 			return
 		default:
 			glog.Error(err)
+			continue
 		}
 		switch msg := m.(type) {
 		case *rainforest.InstantaneousDemand:
