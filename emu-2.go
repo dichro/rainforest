@@ -3,6 +3,7 @@ package rainforest
 import (
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"strconv"
 )
 
@@ -76,8 +77,31 @@ type TimeCluster struct {
 	LocalTime   HexInt64
 }
 
-type EMU2Message struct {
-	InstantaneousDemand
-	CurrentSummationDelivered
-	TimeCluster
+// ParseEMU2Message returns the next EMU-2 message from this XML decoder.
+func ParseEMU2Message(d *xml.Decoder) (interface{}, error) {
+	var ret interface{}
+	var start xml.StartElement
+	for {
+		t, err := d.Token()
+		if err != nil {
+			return ret, err
+		}
+		if s, ok := t.(xml.StartElement); ok {
+			start = s
+			break
+		}
+	}
+	switch start.Name.Local {
+	case "InstantaneousDemand":
+		ret = &InstantaneousDemand{}
+	case "CurrentSummationDelivered":
+		ret = &CurrentSummationDelivered{}
+	case "TimeCluster":
+		ret = &TimeCluster{}
+	default:
+		err := fmt.Errorf("unknown message type %q", start.Name)
+		d.Skip()
+		return ret, err
+	}
+	return ret, d.DecodeElement(ret, &start)
 }

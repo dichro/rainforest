@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/xml"
 	"flag"
+	"fmt"
 	"html/template"
 	"io"
 	"os"
@@ -22,16 +23,19 @@ func main() {
 	flag.Parse()
 	r := xml.NewDecoder(os.Stdin)
 	for {
-		var m rainforest.EMU2Message
-		switch err := r.Decode(&m); err {
+		m, err := rainforest.ParseEMU2Message(r)
+		switch err {
+		case nil:
 		case io.EOF:
 			return
-		case nil:
-			if err := t.Execute(os.Stdout, m.InstantaneousDemand); err != nil {
-				glog.Exit(err)
-			}
 		default:
 			glog.Error(err)
+		}
+		switch msg := m.(type) {
+		case *rainforest.InstantaneousDemand:
+			t.Execute(os.Stdout, msg)
+		default:
+			fmt.Printf("unknown message: %#v\n", msg)
 		}
 	}
 }
