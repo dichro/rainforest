@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"time"
 )
 
 // HexInt64 is an int64 that hex-decodes itself on UnmarshalXML.
@@ -32,10 +33,25 @@ func (n *HexInt64) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	return err
 }
 
+type HexTime struct {
+	time.Time
+}
+
+var hexTimeReference = time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
+
+func (t *HexTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var n HexInt64
+	if err := n.UnmarshalXML(d, start); err != nil {
+		return err
+	}
+	t.Time = hexTimeReference.Add(time.Duration(n) * time.Second)
+	return nil
+}
+
 type InstantaneousDemand struct {
 	DeviceMacId         string
 	MeterMacId          string
-	TimeStamp           HexInt64
+	TimeStamp           HexTime
 	Demand              HexInt64
 	Multiplier          HexInt64
 	Divisor             HexInt64
@@ -60,7 +76,7 @@ func (i InstantaneousDemand) DemandKW() float64 {
 type CurrentSummationDelivered struct {
 	DeviceMacId         string
 	MeterMacId          string
-	TimeStamp           HexInt64
+	TimeStamp           HexTime
 	SummationDelivered  HexInt64
 	SummationReceived   HexInt64
 	Multiplier          HexInt64
@@ -73,8 +89,8 @@ type CurrentSummationDelivered struct {
 type TimeCluster struct {
 	DeviceMacId string
 	MeterMacId  string
-	UTCTime     HexInt64
-	LocalTime   HexInt64
+	UTCTime     HexTime
+	LocalTime   HexTime
 }
 
 // ParseEMU2Message returns the next EMU-2 message from this XML decoder.
