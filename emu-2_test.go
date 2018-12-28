@@ -57,11 +57,3 @@ func TestTimeCluster(t *testing.T) {
 		t.Fatalf("unmarshal TimeCluster failed: %s", err)
 	}
 }
-
-// hmm, broken.
-func testEMU2Message(t *testing.T) {
-	var m EMU2Message
-	if err := xml.Unmarshal([]byte(instantaneousDemand), &m); err != nil {
-		t.Fatalf("unmarshal failed: %s", err)
-	}
-}
